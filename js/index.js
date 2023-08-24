@@ -1,8 +1,10 @@
+//Como agregar el modo estricto js
+"use strict";
+
 const titleName = 'Parking pro';
 const minimoIngresoFijo = 600;
 const valorMinutos = 20;
 const tiempoMinimo = 30;
-
 
 //find a element html by id
 const modalRegister = document.getElementById('createModal');
@@ -58,8 +60,13 @@ function calculoMonto( patente, horaIngreso ){
 };
 
 const sendInfoParking = (inputPlaca) => {
-    
-    if (!inputPlaca) return alert("Debe ingresar una placa");
+  if (!inputPlaca) {
+    const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.textContent = "Debe ingresar una placa";
+    errorModal.show();
+    return false;
+  }
     // obtener hora del sisitema
     const dateNow = new Date();
     let hourNow = dateNow.getHours() + ':' + ( dateNow.getMinutes().toString() ).padStart(2, 0);
@@ -72,8 +79,10 @@ const sendInfoParking = (inputPlaca) => {
         "patente" :`${inputPlaca}`
     }]
 
+    // const allData = localStorage.getItem('dataLocal');
+    // const addNewData = [...allData , infoPark];
+    // localStorage.setItem('dataLocal', JSON.stringify(addNewData));
     printList(infoPark);
-  
     return true;
 }
 
@@ -107,9 +116,16 @@ modalRegister.addEventListener('show.bs.modal', () => {
     labelHourIngreso.value = hourNow;
 });
 
+async function showRegisters() {
+  // localStorage.clear();
+  localStorage.setItem('dataLocal',[]);
+  const data = localStorage.getItem('dataLocal');
+  printList(data);
+}
+
 async function initState () {
   showTitlesTable();
-//   await showRegisters();
+  await showRegisters();
 }
   
 initState();
