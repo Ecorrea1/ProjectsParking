@@ -11,7 +11,6 @@ const modalRegister = document.getElementById('createModal');
 
 const titlesTable = [ 'Pantete', 'Hora Ingreso', 'Hora Egreso', 'Acciones'];
 const tableTitles = document.getElementById('list_titles');
-// const trTitles = document.getElementById('list_titles_tr');
 const table = document.getElementById('list_row');
 const quantityRowsOfTable = 5;
 
@@ -26,13 +25,17 @@ const inputPatente = document.getElementById('inputPatente');
 
 const printList = async ( data ) => {
   table.innerHTML = "";
+  // const spinner = document.createElement("div");
+  // spinner.classList.add('spinner');
+  // table.innerHTML = `<tr><div class="spinner"></div></tr>`;
+  
   if( data.length == 0 ) {
-    // showMessegeAlert( false, 'No se encontraron registros' );
+    table.innerHTML = "";
     return table.innerHTML = `<tr><td colspan="${ titlesTable.length + 1 }" class="text-center">No hay registros</td></tr>`;
   }
-  
-  for ( const i in data ) {
 
+  table.innerHTML = "";
+  for ( const i in data ) {
     const { horaIngreso, horaEgreso, patente } = data[i];
     const actions = [
       `<button type="button" id='btnShowRegister' onClick='calculoMonto("${ patente }", "${ horaIngreso }")' class="btn btn-primary">TERMINAR</button>`,
@@ -43,20 +46,19 @@ const printList = async ( data ) => {
     const customRow = `<td>${ [ patente, horaIngreso, horaEgreso, actions ].join('</td><td>') }</td>`;
     const row       = `<tr class="${ rowClass }">${ customRow }</tr>`;
     table.innerHTML += row;
-
   }
 }
 
 //Calcular monto minimo por minutos ingresados en el parking
 function calculoMonto( patente, horaIngreso ){
 
-    console.log( 'hora de ingreso', horaIngreso );
-    const dateNow = new Date();
-    const hourNow = dateNow.getHours() + ':' + (dateNow.getMinutes().toString()).padStart(2, 0);
-    const calculaTiempo =  horaIngreso - hourNow
-    const total = (calculaTiempo > tiempoMinimo) ? minimoIngresoFijo * valorMinutos / tiempoMinimo : minimoIngresoFijo
-    alert(`Este es el total de patente: ${patente} |  ${total}`);
-    
+  console.log( 'hora de ingreso', horaIngreso );
+  const dateNow = new Date();
+  const hourNow = dateNow.getHours() + ':' + (dateNow.getMinutes().toString()).padStart(2, 0);
+  const calculaTiempo =  horaIngreso - hourNow
+  const total = (calculaTiempo > tiempoMinimo) ? minimoIngresoFijo * valorMinutos / tiempoMinimo : minimoIngresoFijo
+  alert(`Este es el total de patente: ${patente} |  ${total}`);
+  
 };
 
 const sendInfoParking = (inputPlaca) => {
@@ -74,14 +76,15 @@ const sendInfoParking = (inputPlaca) => {
     labelHourIngreso.value = hourNow;
     
     const infoPark = [{
-        "horaIngreso": `${hourNow}`,
-        "horaEgreso": `-`,
-        "patente" :`${inputPlaca}`
+      "horaIngreso": `${hourNow}`,
+      "horaEgreso": `-`,
+      "patente" :`${inputPlaca}`
     }]
 
     // const allData = localStorage.getItem('dataLocal');
     // const addNewData = [...allData , infoPark];
     // localStorage.setItem('dataLocal', JSON.stringify(addNewData));
+    
     printList(infoPark);
     return true;
 }
@@ -101,11 +104,11 @@ createRegister.addEventListener('click', async (e) => {
 
 // Show titles of table
 const showTitlesTable = () => {
-    let titles = '';
-    for (const i in titlesTable ) {
-      titles += `<th>${ titlesTable[i] }</th>`;
-    }
-    tableTitles.innerHTML += `<tr>${ titles }</tr>`;
+  let titles = '';
+  for (const i in titlesTable ) {
+    titles += `<th>${ titlesTable[i] }</th>`;
+  }
+  tableTitles.innerHTML += `<tr>${ titles }</tr>`;
 }
 
 
@@ -124,8 +127,16 @@ async function showRegisters() {
 }
 
 async function initState () {
-  showTitlesTable();
-  await showRegisters();
-}
   
-initState();
+}
+
+window.addEventListener("load", async() => {
+  dateAttentionSearch.max = new Date().toISOString().substring(0,10);
+  showTitlesTable();
+  const spinner = document.getElementsByClassName('spinner');
+  table.innerHTML = spinner;
+  await showRegisters();
+  const fader = document.getElementById('fader');
+  fader.classList.add("close");
+  fader.style.display = 'none';
+})

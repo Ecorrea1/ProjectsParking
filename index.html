@@ -3,67 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="js/components/loader.js" type="text/javascript"></script>
+    <script src="js/components/formSearch.js" type="text/javascript"></script>
+    <script src="js/components/table.js" type="text/javascript"></script>
+    <script src="js/components/modal.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="css/spinner.css">
+    <link rel="stylesheet" href="css/styles.css">
     <title>Parking - Calama</title>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
- <header>
-  <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="#">Administracion Parking</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/views/reportes.html">Reportes</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/views/escritorio.html">Escritorio</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/views/tipos.html">Tipos</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/views/tarifas.html">Tarifas</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/views/usuarios.html">Usuarios</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/views/ajustes.html">Ajustes</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link disabled" aria-disabled="true">Acerca de</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
+  <loader-component></loader-component>
+  <div id="alert-msg" class="alert" role="alert" insvisible hidden></div>
+  <header>
+   <header-component></header-component>
+  </header>
 
- </header>
-
-    <h1 class="text-center">Administracion de Parking</h1>
-    <p class="text-center">Este sistema es para el control de parking de Calama</p>
-    <div class="container">
-      <button id="btn-ingreso" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">Ingresar parking</button>
-    </div>
+  <form-search-component></form-search-component>
     
-    <br>
+  <div class="container">
+    <button id="btn-ingreso" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">Ingresar parking</button>
+  </div>
 
-    <div class="container" >
-        <table class="table table-striped table-xl table-bordered table-hover table-responsive-xxl">
-          <caption>Lista de Registros</caption>
-          <thead id="list_titles" class="table-dark"></thead>
-          <tbody id="list_row"></tbody>
-        </table>
-    </div>
+  <div class="container" >
+    <table-component></table-component>
+  </div>
 
 <!-- Modal -->
 <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="s">
@@ -127,7 +92,7 @@
     </div>
   </div>
 </div>
-
-    <script src="index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  <script src="js/index.js"></script>
 </body>
 </html>
