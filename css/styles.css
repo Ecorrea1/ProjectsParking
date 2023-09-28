@@ -1,10 +1,10 @@
 @import 'loader.css';
 
-html{
+html {
   height: 100%;
 }
 
-body{
+body {
   display: flex;
   flex-direction: column;
   min-height: 100%;
@@ -35,14 +35,18 @@ body{
   padding-top: 2%;
   padding-bottom: 2rem;
   align-items: center;
-  justify-content:space-evenly ;
+}
+
+.container-search input{
+  width: 16rem;
+  height: 2.5rem;
 }
 
 .container-search button {
   width: 6rem;
   height: 2.34rem;
-  margin-top: 2rem;
-  /* margin-left: 1rem; */
+  /* margin-top: 0.3rem; */
+  margin-left: .2rem;
 }
 
 #btn-ingreso{
@@ -74,6 +78,13 @@ footer {
   form {
     display: flex;
     flex-direction: column;
+  }
+
+  .container-search input{
+    display: flex;
+    margin-top: 1rem;
+    width: 100%;
+    justify-content: center;
   }
 
   .container-search button{
