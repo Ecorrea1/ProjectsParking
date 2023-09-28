@@ -7,7 +7,7 @@ class Footer extends HTMLElement {
         this.innerHTML = `
         <footer>
           <p class="copyright">
-            © Derechos Reservados 2023 | OPTICA MONTENCARLOS</a>
+            © Derechos Reservados 2023 | Simplepark</a>
           </p>
         </footer>
       `;

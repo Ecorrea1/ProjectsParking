@@ -17,22 +17,22 @@ class Header extends HTMLElement {
             <a class="nav-link active" aria-current="page" href="">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/views/reportes.html">Reportes</a>
+            <a class="nav-link disabled" aria-disabled="true" href="/views/reportes.html">Reportes</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/views/escritorio.html">Escritorio</a>
+            <a class="nav-link disabled" aria-disabled="true" href="/views/escritorio.html">Escritorio</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/views/tipos.html">Tipos</a>
+            <a class="nav-link disabled" aria-disabled="true" href="/views/tipos.html">Tipos</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/views/tarifas.html">Tarifas</a>
+            <a class="nav-link disabled" aria-disabled="true" href="/views/tarifas.html">Tarifas</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/views/usuarios.html">Usuarios</a>
+            <a class="nav-link disabled" aria-disabled="true" href="/views/usuarios.html">Usuarios</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/views/ajustes.html">Ajustes</a>
+            <a class="nav-link disabled" aria-disabled="true" href="/views/ajustes.html">Ajustes</a>
           </li>
           <li class="nav-item">
             <a class="nav-link disabled" aria-disabled="true">Acerca de</a>
