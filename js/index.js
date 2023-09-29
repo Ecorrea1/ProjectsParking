@@ -8,6 +8,9 @@ const minimoIngresoFijo = 600;
 const valorMinutos = 20;
 const tiempoMinimo = 30;
 
+
+const horaActual = document.getElementById('horaActual');
+
 // Show Alert
 // const alert = document.getElementById('alert-msg');
 
@@ -21,16 +24,31 @@ const quantityRowsOfTable = 5;
 
 const btnIngreso = document.getElementById('btn-ingreso');
 const createRegister = document.getElementById('create-register');
+const egresoRegister = document.getElementById('save-register');
 const btnEgreso = document.getElementById('btn-egreso');
 
 // Elements of form
 const formRegister = document.getElementById('form-create-register');
 const labelHourIngreso =document.getElementById('staticHour');
+const labelHourEgreso =document.getElementById('staticHourEgreso');
 const inputPatente = document.getElementById('inputPatente');
 
 // Elements if Modal
 const errorModal = document.getElementById('errorModal');
 const errorMessage = document.getElementById('errorMessage');
+
+
+function showTime(){
+  const dateNow = new Date();
+  let hours = dateNow.getHours();
+  let minutes = dateNow.getMinutes();
+  let seconds = dateNow.getSeconds();
+  if (hours < 10) hours = 0 + hours;
+  if (minutes < 10) minutes = "0" + minutes;
+  if (seconds < 10) seconds = "0" + seconds;
+  horaActual.innerHTML = hours+ ":" +minutes+ ":" +seconds;
+}
+setInterval(() => showTime(), 1000);
 
 function consulta  ( url, method = 'GET' ) {
   return new Promise(( resolve, reject ) => {
@@ -68,10 +86,10 @@ const printList = async ( data ) => {
 const sendInfoParking = async (uidPatente = '', btnAction = 'create_register') => {
   const dateNow = new Date();
   const hourNow = dateNow.getHours() + ':' + (dateNow.getMinutes().toString()).padStart(2, 0);
-  labelHourIngreso.value = hourNow;
+  labelHourIngreso.value = btnAction == 'create_register' ? hourNow : '';
   const data = {
     inicioServicio: dateNow,
-    // finServicio: null,
+    finServicio: null,
     placaServicio : uidPatente.toUpperCase()
   }
   
@@ -114,6 +132,17 @@ function calculoMonto( patente, horaIngreso ){
   alert(`Este es el total de patente: ${patente} |  ${total}`);
 };
 
+
+async function sendEgresoParking(patente, horaIngreso) {
+
+  const dateNow = new Date();
+  const hourNow = dateNow.getHours() + ':' + (dateNow.getMinutes().toString()).padStart(2, 0);
+  labelHourEgreso.value = hourNow
+
+  calculoMonto(patente, horaIngreso);
+
+}
+
 function showHourIngreso() {
   const dateNow = new Date();
   const hourNow = dateNow.getHours() + ':' + (dateNow.getMinutes().toString()).padStart(2, 0);
@@ -124,6 +153,18 @@ createRegister.addEventListener('click', async (e) => {
   e.preventDefault();
   //Verificar que los campos esten llenos
   const result = await sendInfoParking(inputPatente.value);
+  if(result) bootstrap.Modal.getInstance(modalRegister).hide();
+});
+
+// Escuchar el evento de click del boton btnIngreso y ejecutar sendInfoParking
+egresoRegister.addEventListener('click', async (e) => {
+  e.preventDefault();
+  //Verificar que los campos esten llenos
+
+  consulta('/registers/','GET')
+
+
+  const result = await sendInfoParking(inputPatente.value, 'edit_register');
   if(result) bootstrap.Modal.getInstance(modalRegister).hide();
 });
 
@@ -138,6 +179,8 @@ const showTitlesTable = () => {
 
 modalRegister.addEventListener('show.bs.modal', () => {
   formRegister.reset();
+  const dateNow = new Date();
+  const hourNow = dateNow.getHours() + ':' + (dateNow.getMinutes().toString()).padStart(2, 0);
   labelHourIngreso.value = hourNow;
 });
 
