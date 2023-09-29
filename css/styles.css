@@ -11,6 +11,12 @@ body {
   background-color: #e1e2e1;
 }
 
+h1 {
+  font-size: 2em;
+  color: #2196f3;
+  padding-left: 1rem;
+}
+
 .fader{
   width: 100%;
   height: 100%;
