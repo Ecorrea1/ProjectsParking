@@ -1,15 +1,11 @@
 class Loader extends HTMLElement {
-    constructor() {
-        super();
-    }
-
+    constructor() { super(); }
     connectedCallback() {
         this.innerHTML = `
         <div id="fader" class="fader">
           <div class="loading"></div>
           <p class="message">Cargando...</p>
-        </div>
-        `;
+        </div>`;
     }
 }
 
