@@ -9,6 +9,11 @@ const horaActual = document.getElementById('horaActual');
 // Show Alert
 const alertMsG = document.getElementById('alert-msg');
 
+const formSearch = document.getElementById('form-search');
+const idServicioSearchInput = document.getElementById('idServicioSearchInput');
+const patenteSearchInput = document.getElementById('patenteSearchInput');
+const inicioServicioSearchInput = document.getElementById('inicioServicioSearchInput');
+const btnClearFormSearch = document.getElementById('btn-clear-search');
 
 let patenteValidator = false;
 //find a element html by id
@@ -50,7 +55,7 @@ function showTime(){
   let hours = dateNow.getHours();
   let minutes = dateNow.getMinutes();
   let seconds = dateNow.getSeconds();
-  if (hours < 10) hours = 0 + hours;
+  if (hours < 10) hours = "0" + hours;
   if (minutes < 10) minutes = "0" + minutes;
   if (seconds < 10) seconds = "0" + seconds;
   horaActual.innerHTML = hours+ ":" +minutes+ ":" +seconds;
@@ -68,8 +73,9 @@ function consulta  ( url, method = 'GET' ) {
 
 const printList = async ( data ) => {
   table.innerHTML = "";
-  if( data.length == 0 || !data || data == undefined ) {
-    console.log('No hay datos');
+  console.log(data);
+  
+  if( data.length == 0 || !data) {
     showMessegeAlert( false, 'No se encontraron registros' );
     return table.innerHTML = `<tr><td colspan="${ titlesTable.length + 1 }" class="text-center">No hay registros</td></tr>`;
   }
@@ -179,7 +185,6 @@ const showRegisters = async () => {
 // Show register by id
 const showRegistersForId = async ( id ) => {
   const data = JSON.parse( localStorage.getItem('estacionamientos') );
-  if (data) return '';
   const register = await consulta( api + 'registers/' + id );
   printList( register.data );
 }
@@ -272,8 +277,8 @@ async function showModalCreateOrEdit( uid ) {
   console.log(register.msg);
   
   const dateNow = new Date();
-  const hourNow = `${dateNow.getFullYear()}/${addZeroToDate(dateNow.getDate())}/${addZeroToDate(dateNow.getDay())} ${dateNow.getHours()}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
-  labelHourIngreso.value = hourNow;
+  // const hourNow = `${dateNow.getFullYear()}-${addZeroToDate(dateNow.getDate())}-${addZeroToDate(dateNow.getDay())} ${ addZeroToDate(dateNow.getHours())}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
+  labelHourIngreso.value = dateNow.toISOString();
 
   const {
     placaServicio,
@@ -282,23 +287,35 @@ async function showModalCreateOrEdit( uid ) {
 
   labelIdInfo.value = uid;
   patenteInputInfo.value =  placaServicio;
-  labelHourIngresoInfo.value = inicioServicio;
-  labelHourEgresoInfo.value =  hourNow;
+  labelHourIngresoInfo.value = changeDate(inicioServicio);
+  labelHourEgresoInfo.value =  dateNow.toDateString();
   totalInput.value = calculoMonto(inicioServicio.substring(11,16));
 }
 
-saveRegisterInfo.addEventListener('click', (e) => {
+saveRegisterInfo.addEventListener('click', async(e) => {
   e.preventDefault();
-  console.log('Estoy actualizando un dato');
-  sendInfoParking(labelIdInfo.value, 'EDIT');
-
+  await sendInfoParking(labelIdInfo.value, 'EDIT');
 })
+
+
+const searchRegister = async ( searchQuery ) => {
+  const register = await consulta( api + 'registers/search?page=1' + searchQuery );
+  printList( register.data );
+}
+
+formSearch.addEventListener('submit', async(e) => {
+  e.preventDefault();
+  if ( idServicioSearchInput.value === '' && patenteSearchInput.value === '' && inicioServicioSearchInput.value === '' ) return await showRegisters();
+  const searchQuery = '&idServicio=' + idServicioSearchInput.value + '&placaServicio=' + patenteSearchInput.value + '&inicioServicio=' + inicioServicioSearchInput.value;
+  return await searchRegister( searchQuery );
+});
+
+btnClearFormSearch.addEventListener('click', async() =>  await showRegisters())
+
 function clearForm() {
   // modalTitle.textContent = ''
   patenteInput.value = ''
-
   patenteInput.style.borderColor = 'hsl(270, 3%, 87%)'
-
   divErrorPatente.innerText = ''
 }
 
@@ -308,7 +325,7 @@ const addZeroToDate = (data) => data.toString().length == 1 ? '0' + data : data
 const changeDate = (date) => date ? date.substring(0, 10) + ' ' + date.substring(11,19) : '-'
 
 window.addEventListener("load", async() => {
-  dateAttentionSearch.max = new Date().toISOString().substring(0,10);
+  inicioServicioSearchInput.max = new Date().toISOString().substring(0,10);
   showTitlesTable();
   const spinner = document.getElementsByClassName('spinner');
   table.innerHTML = spinner;
