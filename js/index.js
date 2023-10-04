@@ -1,37 +1,44 @@
 "use strict";
 
-const dateNow = new Date();
-const hourNow = dateNow.getHours() + ':' + (dateNow.getMinutes().toString()).padStart(2, 0);
-
 const titleName = 'Parking pro';
 const minimoIngresoFijo = 600;
 const valorMinutos = 20;
 const tiempoMinimo = 30;
-
-
 const horaActual = document.getElementById('horaActual');
 
 // Show Alert
-// const alert = document.getElementById('alert-msg');
+const alertMsG = document.getElementById('alert-msg');
 
+
+let patenteValidator = false;
 //find a element html by id
 const modalRegister = document.getElementById('createModal');
+const modalInfo = document.getElementById('modalInfo');
+const myModal = new bootstrap.Modal('#createModal', { keyboard: false });
+const myModalInfo = new bootstrap.Modal('#modalInfo', { keyboard: false });
 
-const titlesTable = [ 'Patente', 'Hora Ingreso', 'Hora Egreso', 'Acciones'];
+const titlesTable = ['ID', 'Patente', 'Hora Ingreso', 'Hora Egreso', 'Acciones'];
 const tableTitles = document.getElementById('list_titles');
 const table = document.getElementById('list_row');
-const quantityRowsOfTable = 5;
 
 const btnIngreso = document.getElementById('btn-ingreso');
+const btnExitRegister = document.getElementById('btnExitRegister')
 const createRegister = document.getElementById('create-register');
-const egresoRegister = document.getElementById('save-register');
 const btnEgreso = document.getElementById('btn-egreso');
 
 // Elements of form
 const formRegister = document.getElementById('form-create-register');
-const labelHourIngreso =document.getElementById('staticHour');
-const labelHourEgreso =document.getElementById('staticHourEgreso');
-const inputPatente = document.getElementById('inputPatente');
+const formInfo = document.getElementById('form-info-register');
+const labelHourIngreso =document.getElementById('labelStaticHour');
+const labelHourEgreso =document.getElementById('labelStaticHourEgreso');
+const patenteInput = document.getElementById('patenteInput');
+const saveRegisterInfo = document.getElementById('save-register-info');
+
+const labelIdInfo =document.getElementById('labelIdInfo');
+const labelHourIngresoInfo =document.getElementById('labelStaticHourInfo');
+const labelHourEgresoInfo =document.getElementById('labelStaticHourEgresoInfo');
+const patenteInputInfo = document.getElementById('patenteInfoInput');
+const totalInput = document.getElementById('totalInput');
 
 // Elements if Modal
 const errorModal = document.getElementById('errorModal');
@@ -67,49 +74,34 @@ const printList = async ( data ) => {
     return table.innerHTML = `<tr><td colspan="${ titlesTable.length + 1 }" class="text-center">No hay registros</td></tr>`;
   }
 
-  console.log('Estoy por aca en printList');
-  
-
   for ( const i in data ) {
-    const { inicioServicio, finServicio, placaServicio } = data[i];
+    const { idServicio, inicioServicio, finServicio, placaServicio } = data[i];
     const actions = [
-      `<button type="button" id='btnShowRegister' onClick='calculoMonto("${ placaServicio }", "${ inicioServicio }")' class="btn btn-primary">TERMINAR</button>`,
-    //   `<button type="button" class="btn btn-danger">ELIMINAR</button>`
+      `<button type="button" id='btnExitRegister' onClick='showModalCreateOrEdit("${ idServicio }", true ,"EDIT")' class="btn btn-primary">TERMINAR</button>`,
     ]
 
     const rowClass = 'text-right';
-    const customRow = `<td>${ [ placaServicio, inicioServicio, finServicio, actions ].join('</td><td>') }</td>`;
+    const customRow = `<td>${ [idServicio, placaServicio, changeDate(inicioServicio), changeDate(finServicio), actions ].join('</td><td>') }</td>`;
     const row = `<tr class="${ rowClass }">${ customRow }</tr>`;
     table.innerHTML += row;
   }
 }
-const sendInfoParking = async (uidPatente = '', btnAction = 'create_register') => {
-  const dateNow = new Date();
-  const hourNow = dateNow.getHours() + ':' + (dateNow.getMinutes().toString()).padStart(2, 0);
-  labelHourIngreso.value = btnAction == 'create_register' ? hourNow : '';
+const sendInfoParking = async (idServicio = '', action = 'CREATE'|'EDIT') => {
+ 
+  patenteValidator = validateAllfields(patenteInput, divErrorPatente);
+  if (!patenteValidator && action == 'CREATE') return console.log('Ingresa Patente');
+  
   const data = {
-    inicioServicio: dateNow,
-    finServicio: null,
-    placaServicio : uidPatente.toUpperCase()
+    inicioServicio: action == 'CREATE' ? labelHourIngreso.value : labelHourIngresoInfo.value,
+    finServicio: action == 'CREATE' ? null : labelHourEgresoInfo.value,
+    placaServicio :action == 'CREATE' ?  patenteInput.value.toUpperCase() : patenteInputInfo.value
   }
   
-  createEditRegister( data, 'POST').then(response => {
-    if(response.ok){
-      showRegisters();
-      // reset of Formulary
-      formRegister.reset();
-      modalTitle.textContent = btnAction == 'edit_register' ? `Registro editado de ${ data.placaServicio }` : 'Registro Creado';
-      //Close modal
-      bootstrap.Modal.getInstance(modalRegister).hide();
-      modalTitle.textContent = '';
-      showMessegeAlert( false, 'edit_register' ? `Registro Editado` : 'Registro Creado');
-      return true;
-    }
-  }).catch(err => {
-    console.log(err)
-    showMessegeAlert( true, 'Error al editar el registro');
-    return false;
-  });
+  const result = await createEditRegister( data, 'POST', idServicio );
+  if (!result) return showMessegeAlert( true, 'Error al editar el registro');
+  await showRegisters();
+  bootstrap.Modal.getInstance(action = 'CREATE' ? modalRegister : modalInfo).hide();
+  showMessegeAlert( false, 'EDIT' ? `Registro Editado` : 'Registro Creado');
 }
 
 
@@ -119,54 +111,46 @@ const createEditRegister = async ( data, methods ='POST', uid = '') => {
     method: methods,
     headers: { 'Content-Type': 'application/json'},
     body: JSON.stringify(data)
+  })
+  .then(response => {
+      console.log(response.ok);
+      return true;
+    }
+  )
+  .catch(err => {
+    console.log(err)
+    return false;
   });
 }
 
 //Calcular monto minimo por minutos ingresados en el parking
-function calculoMonto( patente, horaIngreso ){
-  console.log( 'hora de ingreso', horaIngreso );
+function calculoMonto( horaIngreso ){
   const dateNow = new Date();
-  const hourNow = dateNow.getHours() + ':' + (dateNow.getMinutes().toString()).padStart(2, 0);
+  const hourNow = `${dateNow.getFullYear()}/${addZeroToDate(dateNow.getDate())}/${addZeroToDate(dateNow.getDay())} ${dateNow.getHours()}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
   const calculaTiempo =  horaIngreso - hourNow
-  const total = (calculaTiempo > tiempoMinimo) ? minimoIngresoFijo * valorMinutos / tiempoMinimo : minimoIngresoFijo
-  alert(`Este es el total de patente: ${patente} |  ${total}`);
+  return (calculaTiempo > tiempoMinimo) ? minimoIngresoFijo * valorMinutos / tiempoMinimo : minimoIngresoFijo
 };
 
 
 async function sendEgresoParking(patente, horaIngreso) {
-
   const dateNow = new Date();
-  const hourNow = dateNow.getHours() + ':' + (dateNow.getMinutes().toString()).padStart(2, 0);
+  const hourNow = `${dateNow.getFullYear()}/${addZeroToDate(dateNow.getDate())}/${addZeroToDate(dateNow.getDay())} ${dateNow.getHours()}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
   labelHourEgreso.value = hourNow
-
   calculoMonto(patente, horaIngreso);
-
 }
 
 function showHourIngreso() {
   const dateNow = new Date();
-  const hourNow = dateNow.getHours() + ':' + (dateNow.getMinutes().toString()).padStart(2, 0);
+  const hourNow = `${dateNow.getFullYear()}/${addZeroToDate(dateNow.getDate())}/${addZeroToDate(dateNow.getDay())} ${dateNow.getHours()}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
   return hourNow;
 }
 // Escuchar el evento de click del boton btnIngreso y ejecutar sendInfoParking
 createRegister.addEventListener('click', async (e) => {
   e.preventDefault();
-  //Verificar que los campos esten llenos
-  const result = await sendInfoParking(inputPatente.value);
+  const result = await sendInfoParking('','CREATE' );
   if(result) bootstrap.Modal.getInstance(modalRegister).hide();
 });
 
-// Escuchar el evento de click del boton btnIngreso y ejecutar sendInfoParking
-egresoRegister.addEventListener('click', async (e) => {
-  e.preventDefault();
-  //Verificar que los campos esten llenos
-
-  consulta('/registers/','GET')
-
-
-  const result = await sendInfoParking(inputPatente.value, 'edit_register');
-  if(result) bootstrap.Modal.getInstance(modalRegister).hide();
-});
 
 // Show titles of table
 const showTitlesTable = () => {
@@ -178,9 +162,10 @@ const showTitlesTable = () => {
 }
 
 modalRegister.addEventListener('show.bs.modal', () => {
+  clearForm();
   formRegister.reset();
   const dateNow = new Date();
-  const hourNow = dateNow.getHours() + ':' + (dateNow.getMinutes().toString()).padStart(2, 0);
+  const hourNow = `${dateNow.getFullYear()}/${addZeroToDate(dateNow.getDate())}/${addZeroToDate(dateNow.getDay())} ${dateNow.getHours()}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
   labelHourIngreso.value = hourNow;
 });
 
@@ -209,18 +194,118 @@ const showRegistersForFilters = async ( filters ) => {
 //Funciones de muestra de mensajes de alerta
 function showMessegeAlert ( isErro = false, message, time = 3000 ) {
   if (isErro) {
-    alert.classList.add('alert-danger');
-    alert.classList.remove('alert-success');
+    alertMsG.classList.add('alert-danger');
+    alertMsG.classList.remove('alert-success');
   } else {
-    alert.classList.add('alert-success');
-    alert.classList.remove('alert-danger');
+    alertMsG.classList.add('alert-success');
+    alertMsG.classList.remove('alert-danger');
   }
-  alert.textContent = message;
-  alert.style.display = 'block';
+  alertMsG.textContent = message;
+  alertMsG.style.display = 'block';
   setTimeout(() => {
-    alert.style.display = 'none';
+    alertMsG.style.display = 'none';
   }, time);
 }
+
+function showError( divInput, divError, messageError = '', show = true ) {
+  if (show){
+    divError.innerText = messageError;
+    divInput.style.borderColor = '#ff0000';
+  } else {
+    divError.innerText = messageError;
+    divInput.style.borderColor = 'hsl(270, 3%, 87%)';
+  }
+}
+
+// Funciones verificadores de campos
+function verifyIsFilled( input, divError ) {
+  if (input.value == '') {
+    divError.style.display = 'block';
+    return false;
+  } else {
+    divError.style.display = 'none';
+    return true;
+  }
+}
+
+function  validateLetters( input ) {
+  //Validar que solo sean letras
+  const regex = /[A-z]/g;
+  return regex.test(input.value) ? true : false;
+}
+
+function validateNumber(input) {
+  // Validar input que solo sean numeros negativos
+  const regex = /^[0-9]*$/;
+  return regex.test(input.value) ? true : false;
+}
+
+function validateAllfields( divInput, divError, fieldNumber = false ) {
+  if(verifyIsFilled(divInput, divError)){
+    if (fieldNumber) {
+      if (validateNumber(divInput)) {
+        showError(divInput, divError, '', false);
+        return true;
+      } 
+      showError(divInput, divError, 'Solo se permiten numeros', true);
+      return false;
+    } else {
+      if(validateLetters(divInput)) {
+        showError(divInput, divError, '', false);
+        return true;
+      }
+      showError(divInput, divError, 'Solo se permiten letras', true);
+      return false;
+    }
+  } else {
+    showError(divInput, divError, 'Este campo es obligatorio');
+    return false;
+  }
+}
+
+async function showModalCreateOrEdit( uid ) {
+  myModalInfo.show();
+  formInfo.reset();
+
+  const register = await consulta( api + 'registers/' + uid );
+  console.log(register.data);
+  console.log(register.msg);
+  
+  const dateNow = new Date();
+  const hourNow = `${dateNow.getFullYear()}/${addZeroToDate(dateNow.getDate())}/${addZeroToDate(dateNow.getDay())} ${dateNow.getHours()}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
+  labelHourIngreso.value = hourNow;
+
+  const {
+    placaServicio,
+    inicioServicio
+ } = register.data;
+
+  labelIdInfo.value = uid;
+  patenteInputInfo.value =  placaServicio;
+  labelHourIngresoInfo.value = inicioServicio;
+  labelHourEgresoInfo.value =  hourNow;
+  totalInput.value = calculoMonto(inicioServicio.substring(11,16));
+}
+
+saveRegisterInfo.addEventListener('click', (e) => {
+  e.preventDefault();
+  console.log('Estoy actualizando un dato');
+  sendInfoParking(labelIdInfo.value, 'EDIT');
+
+})
+function clearForm() {
+  // modalTitle.textContent = ''
+  patenteInput.value = ''
+
+  patenteInput.style.borderColor = 'hsl(270, 3%, 87%)'
+
+  divErrorPatente.innerText = ''
+}
+
+createRegister.addEventListener('click', () => clearForm());
+
+const addZeroToDate = (data) => data.toString().length == 1 ? '0' + data : data
+const changeDate = (date) => date ? date.substring(0, 10) + ' ' + date.substring(11,19) : '-'
 
 window.addEventListener("load", async() => {
   dateAttentionSearch.max = new Date().toISOString().substring(0,10);
