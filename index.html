@@ -40,23 +40,59 @@
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-
         <form class="row g-3" id="form-create-register">
           <div class="col-auto">
-            <label for="staticHour" class="visually-hidden">Hora Ingreso</label>
-            <input type="text" readonly class="form-control-plaintext" id="staticHour" value="">
-          </div>
-          <div class="col-auto" hidden>
-            <label for="staticHourEgreso" class="visually-hidden">Hora Egreso</label>
-            <input type="text" readonly class="form-control-plaintext" id="staticHourEgreso" value="">
+            <label for="staticHour" class="">Hora Ingreso</label>
+            <input type="text" readonly class="form-control-plaintext" id="labelStaticHour" value="">
           </div>
           <div class="col-auto">
-            <label for="inputPatente" class="visually-hidden">Patente</label>
-            <input type="text" class="form-control text-uppercase" id="inputPatente" placeholder="Patente">
+            <label for="patenteInput" class="">Patente</label>
+            <input type="text" class="form-control text-uppercase" id="patenteInput" placeholder="Patente">
+            <div id="divErrorPatente"></div>
           </div>
           <div class="col-auto">
             <button id="create-register" type="submit" class="btn btn-primary mb-3">Confirma Ingreso</button>
-            <button id="save-register" type="submit" class="btn btn-primary mb-3">Confirma Egreso</button>
+          </div>
+        </form>
+
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modalInfo" tabindex="-1" aria-labelledby="modalInfoLabel" aria-hidden="s">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="infoModalLabel"></h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form class="row g-3" id="form-info-register">
+          <div class="col-auto">
+            <label for="id" class="">ID</label>
+            <input type="text" readonly class="form-control-plaintext" id="labelIdInfo" value="">
+          </div>
+          <div class="col-auto">
+            <label for="patenteInfoInput" class="">Patente</label>
+            <input type="text" class="form-control-plaintext text-uppercase" id="patenteInfoInput" placeholder="Patente">
+          </div>
+          <div class="col-auto">
+            <label for="staticHourInfo" class="">Hora Ingreso</label>
+            <input type="text" readonly class="form-control-plaintext" id="labelStaticHourInfo" value="">
+          </div>
+          <div class="col-auto">
+            <label for="staticHourEgresoInfo" class="">Hora Egreso</label>
+            <input type="text" readonly class="form-control-plaintext" id="labelStaticHourEgresoInfo" value="">
+          </div>
+          <div class="col-auto">
+            <label for="patenteInfoInput" class="">TOTAL</label>
+            <input type="number" class="form-control-plaintext text-uppercase" id="totalInput" placeholder="TOTAL">
+          </div>
+          <div class="col-auto">
+            <button id="save-register-info" type="submit" class="btn btn-primary mb-3">Confirma Egreso</button>
           </div>
         </form>
 
