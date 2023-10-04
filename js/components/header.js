@@ -1,10 +1,29 @@
 class Header extends HTMLElement {
-  constructor() { super(); }
+  constructor() { 
+    super(); 
+    this.titleName = 'Administracion Parking';
+    this.navbarClass = '"navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark""';
+  }
+  static get observedAttributes(){
+    return ['titleName', 'navbarClass'];
+  }
+
+  attributeChangeCallback(nameAtr, oldValue, newValue){
+    switch(nameAtr){
+      case 'titleName':
+          this.titleName = newValue;
+      break;
+      case 'navbarClass':
+        this.navbarClass = newValue;
+      break;
+    }
+  }
+
   connectedCallback() {
     this.innerHTML = `
-      <nav class="navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark">
+      <nav class= ${this.navbarClass} >
         <div class="container-fluid">
-          <a class="navbar-brand" href="#">Administracion Parking</a>
+          <a class="navbar-brand" href="#">${ this.titleName }</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
