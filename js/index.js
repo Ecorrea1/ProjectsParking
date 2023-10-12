@@ -125,11 +125,38 @@ const createEditRegister = async ( data, methods ='POST', uid = '') => {
     return false;
   });
 }
-function calculoMonto( horaIngreso, horaEgreso ){
-  console.log(`${ horaIngreso.substring(11,16) } - ${ horaEgreso.substring(11,16) }`);
-  const calculaTiempo =  horaIngreso - horaEgreso
-  return ( calculaTiempo > tiempoMinimo ) ? minimoIngresoFijo * valorMinutos / tiempoMinimo : minimoIngresoFijo
-};
+
+function calculoMonto(horaIngreso, horaEgreso) {
+  // Valores predeterminados
+  const tiempoMinimo = 30; // Tiempo mínimo en minutos
+  const minimoIngresoFijo = 600; // Ingreso fijo mínimo
+  const valorMinutos = 20; // Valor por minuto
+
+  // Convierte las horas de ingreso y egreso en objetos de fecha
+  const fechaIngreso = new Date(horaIngreso);
+  const fechaEgreso = new Date(horaEgreso);
+
+  // Calcula la diferencia en minutos
+  const diferenciaEnMilisegundos = fechaEgreso - fechaIngreso;
+  const diferenciaEnMinutos = diferenciaEnMilisegundos / (1000 * 60);
+
+  // Calcula el monto a pagar
+  const resutl  =  diferenciaEnMinutos > tiempoMinimo
+  ? minimoIngresoFijo + (diferenciaEnMinutos - tiempoMinimo) * valorMinutos
+  : minimoIngresoFijo;
+
+  console.log(resutl);
+
+  return result;
+  
+}
+
+// function calculoMonto( horaIngreso, horaEgreso ){
+//   //Tengo que hacer calculos correctos con las fechas
+//   console.log(`${ horaIngreso.substring(11,16) } - ${ horaEgreso.substring(11,16) }`);
+//   const calculaTiempo =  horaIngreso - horaEgreso
+//   return ( calculaTiempo > tiempoMinimo ) ? minimoIngresoFijo * valorMinutos / tiempoMinimo : minimoIngresoFijo
+// };
 function showHourIngreso() {
   const dateNow = new Date();
   return `${dateNow.getFullYear()}/${addZeroToDate(dateNow.getDate())}/${addZeroToDate(dateNow.getDay())} ${dateNow.getHours()}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
