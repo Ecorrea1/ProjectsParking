@@ -73,8 +73,6 @@ function consulta  ( url, method = 'GET' ) {
 
 const printList = async ( data ) => {
   table.innerHTML = "";
-  console.log(data);
-  
   if( data.length == 0 || !data) {
     showMessegeAlert( false, 'No se encontraron registros' );
     return table.innerHTML = `<tr><td colspan="${ titlesTable.length + 1 }" class="text-center">No hay registros</td></tr>`;
@@ -93,14 +91,13 @@ const printList = async ( data ) => {
   }
 }
 const sendInfoParking = async (idServicio = '', action = 'CREATE'|'EDIT') => {
- 
   patenteValidator = validateAllfields(patenteInput, divErrorPatente);
   if (!patenteValidator && action == 'CREATE') return console.log('Ingresa Patente');
   
   const data = {
     inicioServicio: action == 'CREATE' ? labelHourIngreso.value : labelHourIngresoInfo.value,
     finServicio: action == 'CREATE' ? null : labelHourEgresoInfo.value,
-    placaServicio :action == 'CREATE' ?  patenteInput.value.toUpperCase() : patenteInputInfo.value
+    placaServicio: action == 'CREATE' ?  patenteInput.value.toUpperCase() : patenteInputInfo.value
   }
   
   const result = await createEditRegister( data, 'POST', idServicio );
@@ -128,51 +125,32 @@ const createEditRegister = async ( data, methods ='POST', uid = '') => {
     return false;
   });
 }
-
-//Calcular monto minimo por minutos ingresados en el parking
-function calculoMonto( horaIngreso ){
-  const dateNow = new Date();
-  const hourNow = `${dateNow.getFullYear()}/${addZeroToDate(dateNow.getDate())}/${addZeroToDate(dateNow.getDay())} ${dateNow.getHours()}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
-  const calculaTiempo =  horaIngreso - hourNow
-  return (calculaTiempo > tiempoMinimo) ? minimoIngresoFijo * valorMinutos / tiempoMinimo : minimoIngresoFijo
+function calculoMonto( horaIngreso, horaEgreso ){
+  console.log(`${ horaIngreso.substring(11,16) } - ${ horaEgreso.substring(11,16) }`);
+  const calculaTiempo =  horaIngreso - horaEgreso
+  return ( calculaTiempo > tiempoMinimo ) ? minimoIngresoFijo * valorMinutos / tiempoMinimo : minimoIngresoFijo
 };
-
-
-async function sendEgresoParking(patente, horaIngreso) {
-  const dateNow = new Date();
-  const hourNow = `${dateNow.getFullYear()}/${addZeroToDate(dateNow.getDate())}/${addZeroToDate(dateNow.getDay())} ${dateNow.getHours()}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
-  labelHourEgreso.value = hourNow
-  calculoMonto(patente, horaIngreso);
-}
-
 function showHourIngreso() {
   const dateNow = new Date();
-  const hourNow = `${dateNow.getFullYear()}/${addZeroToDate(dateNow.getDate())}/${addZeroToDate(dateNow.getDay())} ${dateNow.getHours()}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
-  return hourNow;
+  return `${dateNow.getFullYear()}/${addZeroToDate(dateNow.getDate())}/${addZeroToDate(dateNow.getDay())} ${dateNow.getHours()}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
 }
 // Escuchar el evento de click del boton btnIngreso y ejecutar sendInfoParking
 createRegister.addEventListener('click', async (e) => {
   e.preventDefault();
-  const result = await sendInfoParking('','CREATE' );
+  const result = await sendInfoParking('','CREATE');
   if(result) bootstrap.Modal.getInstance(modalRegister).hide();
 });
 
-
-// Show titles of table
 const showTitlesTable = () => {
   let titles = '';
-  for (const i in titlesTable ) {
-    titles += `<th>${ titlesTable[i] }</th>`;
-  }
+  for (const i in titlesTable ) titles += `<th>${ titlesTable[i] }</th>`;
   tableTitles.innerHTML += `<tr>${ titles }</tr>`;
 }
 
 modalRegister.addEventListener('show.bs.modal', () => {
   clearForm();
   formRegister.reset();
-  const dateNow = new Date();
-  const hourNow = `${dateNow.getFullYear()}/${addZeroToDate(dateNow.getDate())}/${addZeroToDate(dateNow.getDay())} ${dateNow.getHours()}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
-  labelHourIngreso.value = hourNow;
+  labelHourIngreso.value = showDateAndHours();
 });
 
 // Show all registers in the table
@@ -181,48 +159,28 @@ const showRegisters = async () => {
   localStorage.setItem('estacionamientos',  JSON.stringify(registers.data));
   printList( registers.data );
 }
-
 // Show register by id
 const showRegistersForId = async ( id ) => {
-  const data = JSON.parse( localStorage.getItem('estacionamientos') );
   const register = await consulta( api + 'registers/' + id );
   printList( register.data );
 }
-
 // Show register by filters
 const showRegistersForFilters = async ( filters ) => {
   const register = await consulta( api + 'registers/' + filters );
   printList( register.data );
 }
-
-
-//Funciones de muestra de mensajes de alerta
 function showMessegeAlert ( isErro = false, message, time = 3000 ) {
-  if (isErro) {
-    alertMsG.classList.add('alert-danger');
-    alertMsG.classList.remove('alert-success');
-  } else {
-    alertMsG.classList.add('alert-success');
-    alertMsG.classList.remove('alert-danger');
-  }
+  alertMsG.classList.add( isErro ? 'alert-danger' : 'alert-success' );
+  alertMsG.classList.remove( isErro ? 'alert-success' : 'alert-danger' );
   alertMsG.textContent = message;
   alertMsG.style.display = 'block';
-  setTimeout(() => {
-    alertMsG.style.display = 'none';
-  }, time);
+  setTimeout(() => { alertMsG.style.display = 'none'; }, time);
 }
-
 function showError( divInput, divError, messageError = '', show = true ) {
-  if (show){
-    divError.innerText = messageError;
-    divInput.style.borderColor = '#ff0000';
-  } else {
-    divError.innerText = messageError;
-    divInput.style.borderColor = 'hsl(270, 3%, 87%)';
-  }
+  divError.innerText = messageError;
+  divInput.style.borderColor = show ? '#ff0000' : 'hsl(270, 3%, 87%)';
+  divError.innerText = messageError;
 }
-
-// Funciones verificadores de campos
 function verifyIsFilled( input, divError ) {
   if (input.value == '') {
     divError.style.display = 'block';
@@ -232,19 +190,16 @@ function verifyIsFilled( input, divError ) {
     return true;
   }
 }
-
 function  validateLetters( input ) {
   //Validar que solo sean letras
   const regex = /[A-z]/g;
   return regex.test(input.value) ? true : false;
 }
-
 function validateNumber(input) {
   // Validar input que solo sean numeros negativos
   const regex = /^[0-9]*$/;
   return regex.test(input.value) ? true : false;
 }
-
 function validateAllfields( divInput, divError, fieldNumber = false ) {
   if(verifyIsFilled(divInput, divError)){
     if (fieldNumber) {
@@ -267,37 +222,27 @@ function validateAllfields( divInput, divError, fieldNumber = false ) {
     return false;
   }
 }
-
 async function showModalCreateOrEdit( uid ) {
   myModalInfo.show();
   formInfo.reset();
 
   const register = await consulta( api + 'registers/' + uid );
-  console.log(register.data);
-  console.log(register.msg);
-  
   const dateNow = new Date();
-  // const hourNow = `${dateNow.getFullYear()}-${addZeroToDate(dateNow.getDate())}-${addZeroToDate(dateNow.getDay())} ${ addZeroToDate(dateNow.getHours())}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
   labelHourIngreso.value = dateNow.toISOString();
 
-  const {
-    placaServicio,
-    inicioServicio
- } = register.data;
+  const { placaServicio, inicioServicio } = register.data;
 
   labelIdInfo.value = uid;
-  patenteInputInfo.value =  placaServicio;
+  patenteInputInfo.value = placaServicio;
   labelHourIngresoInfo.value = changeDate(inicioServicio);
-  labelHourEgresoInfo.value =  dateNow.toDateString();
-  totalInput.value = calculoMonto(inicioServicio.substring(11,16));
+  labelHourEgresoInfo.value = showDateAndHours();
+  totalInput.value = calculoMonto(inicioServicio, showDateAndHours());
 }
 
 saveRegisterInfo.addEventListener('click', async(e) => {
   e.preventDefault();
   await sendInfoParking(labelIdInfo.value, 'EDIT');
 })
-
-
 const searchRegister = async ( searchQuery ) => {
   const register = await consulta( api + 'registers/search?page=1' + searchQuery );
   printList( register.data );
@@ -310,8 +255,7 @@ formSearch.addEventListener('submit', async(e) => {
   return await searchRegister( searchQuery );
 });
 
-btnClearFormSearch.addEventListener('click', async() =>  await showRegisters())
-
+btnClearFormSearch.addEventListener('click', async() =>  await showRegisters());
 function clearForm() {
   // modalTitle.textContent = ''
   patenteInput.value = ''
@@ -320,7 +264,10 @@ function clearForm() {
 }
 
 createRegister.addEventListener('click', () => clearForm());
-
+const showDateAndHours = () => {
+  const dateNow = new Date();
+  return `${dateNow.getFullYear()}-${addZeroToDate(dateNow.getDate())}-${addZeroToDate(dateNow.getDay())} ${ addZeroToDate(dateNow.getHours())}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
+}
 const addZeroToDate = (data) => data.toString().length == 1 ? '0' + data : data
 const changeDate = (date) => date ? date.substring(0, 10) + ' ' + date.substring(11,19) : '-'
 

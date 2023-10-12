@@ -1,6 +1,15 @@
 class Footer extends HTMLElement {
     constructor() {
-        super();
+      super();
+      this.attributesComponents = [];
+    }
+
+    static get observedAttributes(){
+      return [];
+    }
+    attributeChangeCallback(attribute, _, newAttr){
+      this.attributesComponents = [...this.attributesComponents, attribute]
+      this[attribute] = newAttr;
     }
 
     connectedCallback() {

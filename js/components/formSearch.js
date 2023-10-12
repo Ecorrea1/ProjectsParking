@@ -1,32 +1,21 @@
 class FormSearch extends HTMLElement {
     constructor() { 
       super(); 
-      this.name = 'Buscar';
-      this.btnSearchClass = 'form-control me-2 text-uppercase';
-      this.btnClearName = 'Limpiar'
+      this.attributesComponents = [
+        this.name = 'Buscar',
+        this.btnSearchClass = 'form-control me-2 text-uppercase',
+        this.btnClearName = 'Limpiar'
+      ]
     }
     
     static get observedAttributes(){
-      return [
-        'name', 
-        'btnSearchClass', 
-        'btnClearName'
-      ];
+      return ['name', 'btnSearchClass', 'btnClearName'];
     }
 
 
-    attributeChangeCallback(nameAtr, oldValue, newValue){
-      switch(nameAtr){
-        case 'name':
-          this.name = newValue;
-        break;
-        case 'btnSearchClass':
-          this.btnSearchClass = newValue;
-        break;
-        case'btnClearName':
-          this.btnClearName = newValue;
-        break;
-      }
+    attributeChangeCallback(attribute, _, newAttr){
+      this.attributesComponents = [...this.attributesComponents, attribute]
+      this[attribute] = newAttr;
     }
 
     connectedCallback() {
