@@ -1,7 +1,7 @@
 class Alert extends HTMLElement {
     constructor() { super(); }
     connectedCallback() {
-        this.innerHTML = `<div class="alert alert-primary" role="alert"></div>`;
+        this.innerHTML = `<div id="alert-msg" class="alert" role="alert" insvisible hidden></div>`;
     }
 }
 

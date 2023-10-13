@@ -1,22 +1,18 @@
 class Header extends HTMLElement {
   constructor() { 
     super(); 
-    this.titleName = 'Administracion Parking';
-    this.navbarClass = '"navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark""';
+    this.attributesComponents = [
+      this.titleName = 'Administracion Parking',
+      this.navbarClass = '"navbar navbar-expand-lg bg-body-tertiary" data-bs-theme="dark""'
+    ]
   }
   static get observedAttributes(){
     return ['titleName', 'navbarClass'];
   }
 
-  attributeChangeCallback(nameAtr, oldValue, newValue){
-    switch(nameAtr){
-      case 'titleName':
-          this.titleName = newValue;
-      break;
-      case 'navbarClass':
-        this.navbarClass = newValue;
-      break;
-    }
+  attributeChangeCallback(attribute, _, newAttr){
+    this.attributesComponents = [...this.attributesComponents, attribute]
+    this[attribute] = newAttr;
   }
 
   connectedCallback() {

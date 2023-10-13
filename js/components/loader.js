@@ -1,22 +1,26 @@
 class Loader extends HTMLElement {
-    constructor() { super();
-      this.message = 'Cargando...'
+    constructor() { 
+      super();
+      this.attributesComponents = [
+        this.message = 'Cargando...'
+      ]
     }
     static get observedAttributes(){
       return ['message'];
     }
   
-    attributeChangeCallback(nameAtr, oldValue, newValue){
-      if (nameAtr == 'message') {
-        this.message = newValue;
-      }
+    attributeChangeCallback(attribute, _, newAttr){
+      this.attributesComponents = [...this.attributesComponents, attribute]
+      this[attribute] = newAttr;
     }
     connectedCallback() {
-        this.innerHTML = `
-        <div id="fader" class="fader">
-          <div class="loading"></div>
-          <p class="message">${this.message}</p>
-        </div>`;
+      this.innerHTML = `
+      <div id="fader" class="fader">
+        <div class="loading"></div>
+        <p class="message">${this.message}</p>
+      </div>`;
+
+      // this.style = ;
     }
 }
 
