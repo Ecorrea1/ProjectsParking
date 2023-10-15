@@ -126,40 +126,15 @@ const createEditRegister = async ( data, methods ='POST', uid = '') => {
   });
 }
 
-function calculoMonto(horaIngreso, horaEgreso) {
-  // Valores predeterminados
-  const tiempoMinimo = 30; // Tiempo mínimo en minutos
-  const minimoIngresoFijo = 600; // Ingreso fijo mínimo
-  const valorMinutos = 20; // Valor por minuto
-
-  // Convierte las horas de ingreso y egreso en objetos de fecha
-  const fechaIngreso = new Date(horaIngreso);
-  const fechaEgreso = new Date(horaEgreso);
-
-  // Calcula la diferencia en minutos
-  const diferenciaEnMilisegundos = fechaEgreso - fechaIngreso;
-  const diferenciaEnMinutos = diferenciaEnMilisegundos / (1000 * 60);
-
-  // Calcula el monto a pagar
-  const resutl  =  diferenciaEnMinutos > tiempoMinimo
-  ? minimoIngresoFijo + (diferenciaEnMinutos - tiempoMinimo) * valorMinutos
-  : minimoIngresoFijo;
-
-  console.log(resutl);
-
-  return result;
-  
-}
-
-// function calculoMonto( horaIngreso, horaEgreso ){
-//   //Tengo que hacer calculos correctos con las fechas
-//   console.log(`${ horaIngreso.substring(11,16) } - ${ horaEgreso.substring(11,16) }`);
-//   const calculaTiempo =  horaIngreso - horaEgreso
-//   return ( calculaTiempo > tiempoMinimo ) ? minimoIngresoFijo * valorMinutos / tiempoMinimo : minimoIngresoFijo
-// };
-function showHourIngreso() {
-  const dateNow = new Date();
-  return `${dateNow.getFullYear()}/${addZeroToDate(dateNow.getDate())}/${addZeroToDate(dateNow.getDay())} ${dateNow.getHours()}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
+// Función para calcular el costo
+function calculoMonto(inicioServicio, finServicio) {
+  // Calcula el tiempo en minutos
+  const tiempoEstacionamientoEnMinutos = Math.ceil((new Date(finServicio.substring(0,19)) - new Date(inicioServicio.substring(0,19))) / (1000 * 60));
+  // Calcula el costo mínimo por 30 minutos
+  const costoMinimo = tiempoEstacionamientoEnMinutos <= 30 ? 600 : 0;
+  // Calcula el costo adicional por minuto
+  const costoAdicional = (tiempoEstacionamientoEnMinutos - 30) * 10; // $10 por minuto adicional
+  return costoMinimo + costoAdicional;
 }
 // Escuchar el evento de click del boton btnIngreso y ejecutar sendInfoParking
 createRegister.addEventListener('click', async (e) => {
@@ -177,7 +152,7 @@ const showTitlesTable = () => {
 modalRegister.addEventListener('show.bs.modal', () => {
   clearForm();
   formRegister.reset();
-  labelHourIngreso.value = showDateAndHours();
+  labelHourIngreso.value = new Date().toISOString().substring(0,19);
 });
 
 // Show all registers in the table
@@ -254,16 +229,16 @@ async function showModalCreateOrEdit( uid ) {
   formInfo.reset();
 
   const register = await consulta( api + 'registers/' + uid );
-  const dateNow = new Date();
-  labelHourIngreso.value = dateNow.toISOString();
+  const dateNow = new Date().toISOString().substring(0,19);
+  labelHourIngreso.value = changeDate(dateNow);
 
   const { placaServicio, inicioServicio } = register.data;
-
+  
   labelIdInfo.value = uid;
   patenteInputInfo.value = placaServicio;
   labelHourIngresoInfo.value = changeDate(inicioServicio);
-  labelHourEgresoInfo.value = showDateAndHours();
-  totalInput.value = calculoMonto(inicioServicio, showDateAndHours());
+  labelHourEgresoInfo.value = changeDate(dateNow);
+  totalInput.value = calculoMonto( inicioServicio, dateNow);
 }
 
 saveRegisterInfo.addEventListener('click', async(e) => {
@@ -291,10 +266,6 @@ function clearForm() {
 }
 
 createRegister.addEventListener('click', () => clearForm());
-const showDateAndHours = () => {
-  const dateNow = new Date();
-  return `${dateNow.getFullYear()}-${addZeroToDate(dateNow.getDate())}-${addZeroToDate(dateNow.getDay())} ${ addZeroToDate(dateNow.getHours())}:${addZeroToDate(dateNow.getMinutes())}:${ addZeroToDate(dateNow.getSeconds())}`;
-}
 const addZeroToDate = (data) => data.toString().length == 1 ? '0' + data : data
 const changeDate = (date) => date ? date.substring(0, 10) + ' ' + date.substring(11,19) : '-'
 
