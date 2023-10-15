@@ -87,10 +87,15 @@
             <label for="staticHourEgresoInfo" class="">Hora Egreso</label>
             <input type="text" readonly class="form-control-plaintext" id="labelStaticHourEgresoInfo" value="">
           </div>
+
           <div class="col-auto">
-            <label for="patenteInfoInput" class="">TOTAL</label>
-            <input type="number" class="form-control-plaintext text-uppercase" id="totalInput" placeholder="TOTAL">
+            <label for="patenteInfoInput" class="form-label">TOTAL</label>
+            <div class="input-group">
+              <span class="input-group-text" id="inputGroupPrepend3">$</span>
+              <input type="number" class="form-control text-uppercase" min="0" step="1" id="totalInput" disabled readonly>
+            </div>
           </div>
+
           <div class="col-auto">
             <button id="save-register-info" type="submit" class="btn btn-primary mb-3">Confirma Egreso</button>
           </div>
