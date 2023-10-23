@@ -59,6 +59,14 @@ h1 {
   margin-bottom: .5rem;
 }
 
+
+#create-register{
+  display: flex;
+  margin-top: 1.5rem;
+  width: 100%;
+  /* justify-content: center; */
+}
+
 .close{
   opacity: 0;
   transition: 1.5;
@@ -98,5 +106,11 @@ footer {
     margin-top: 1rem;
     width: 100%;
     justify-content: center;
+  }
+
+  #create-register{
+    display: flex;
+    margin-top: 0.1rem;
+    width: 100%;
   }
 }
