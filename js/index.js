@@ -58,7 +58,7 @@ function showTime(){
   if (hours < 10) hours = "0" + hours;
   if (minutes < 10) minutes = "0" + minutes;
   if (seconds < 10) seconds = "0" + seconds;
-  horaActual.innerHTML = hours+ ":" +minutes+ ":" +seconds;
+  horaActual.innerHTML = `${hours}:${minutes}:${seconds}`;
 }
 setInterval(() => showTime(), 1000);
 
@@ -129,12 +129,12 @@ const createEditRegister = async ( data, methods ='POST', uid = '') => {
 // Función para calcular el costo
 function calculoMonto(inicioServicio, finServicio) {
   // Calcula el tiempo en minutos
-  const tiempoEstacionamientoEnMinutos = Math.ceil((new Date(finServicio.substring(0,19)) - new Date(inicioServicio.substring(0,19))) / (1000 * 60));
+  const tiempoEstacionamientoEnMinutos = Math.ceil((new Date(finServicio) - new Date(inicioServicio)) / (1000 * 60));
   // Calcula el costo mínimo por 30 minutos
-  const costoMinimo = tiempoEstacionamientoEnMinutos <= 30 ? 600 : 0;
+  const costoMinimo = tiempoEstacionamientoEnMinutos <= tiempoMinimo ? minimoIngresoFijo : 0;
   // Calcula el costo adicional por minuto
-  const costoAdicional = (tiempoEstacionamientoEnMinutos - 30) * 10; // $10 por minuto adicional
-  return costoMinimo + costoAdicional;
+  const costoAdicional = (tiempoEstacionamientoEnMinutos) * valorMinutos; // $20 por minuto adicional
+  return costoMinimo !== 600 ? costoMinimo + costoAdicional : costoMinimo;
 }
 // Escuchar el evento de click del boton btnIngreso y ejecutar sendInfoParking
 createRegister.addEventListener('click', async (e) => {
@@ -152,7 +152,8 @@ const showTitlesTable = () => {
 modalRegister.addEventListener('show.bs.modal', () => {
   clearForm();
   formRegister.reset();
-  labelHourIngreso.value = new Date().toISOString().substring(0,19);
+  console.log(moment().format());
+  labelHourIngreso.value = moment().format('YYYY-MM-DD HH:mm:ss');
 });
 
 // Show all registers in the table
@@ -229,15 +230,15 @@ async function showModalCreateOrEdit( uid ) {
   formInfo.reset();
 
   const register = await consulta( api + 'registers/' + uid );
-  const dateNow = new Date().toISOString().substring(0,19);
-  labelHourIngreso.value = changeDate(dateNow);
+  const dateNow = new moment().format('YYYY-MM-DD HH:mm:ss');
+  labelHourIngreso.value = dateNow;
 
   const { placaServicio, inicioServicio } = register.data;
   
   labelIdInfo.value = uid;
   patenteInputInfo.value = placaServicio;
-  labelHourIngresoInfo.value = changeDate(inicioServicio);
-  labelHourEgresoInfo.value = changeDate(dateNow);
+  labelHourIngresoInfo.value = moment(inicioServicio).format('YYYY-MM-DD HH:mm:ss');
+  labelHourEgresoInfo.value = dateNow;
   totalInput.value = calculoMonto( inicioServicio, dateNow);
 }
 
@@ -275,7 +276,7 @@ window.addEventListener("load", async() => {
   const spinner = document.getElementsByClassName('spinner');
   table.innerHTML = spinner;
   await showRegisters();
-  // const fader = document.getElementById('fader');
-  // fader.classList.add("close");
-  // fader.style.display = 'none';
+  const fader = document.getElementById('fader');
+  fader.classList.add("close");
+  fader.style.display = 'none';
 })
