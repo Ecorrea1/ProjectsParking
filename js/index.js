@@ -16,6 +16,7 @@ const inicioServicioSearchInput = document.getElementById('inicioServicioSearchI
 const btnClearFormSearch = document.getElementById('btn-clear-search');
 
 let patenteValidator = false;
+const divErrorPatente = document.getElementById('divErrorPatente');
 //find a element html by id
 const modalRegister = document.getElementById('createModal');
 const modalInfo = document.getElementById('modalInfo');

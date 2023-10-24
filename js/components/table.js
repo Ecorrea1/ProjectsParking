@@ -24,14 +24,14 @@ class Table extends HTMLElement {
     }
 
     connectedCallback() {
-        this.innerHTML = `
-        <table id="${this.tableId}" class="${this.tableClass}">
-          <caption>Lista de Registros</caption>
-          <thead id="${this.tableHeadId}" class="table-dark"></thead>
-          <tbody id="${this.tableBodyId}"></tbody>
-        </table>
-        </tfoot>
-        `;
+      this.innerHTML = `
+      <table id="${this.tableId}" class="${this.tableClass}">
+        <caption>Lista de Registros</caption>
+        <thead id="${this.tableHeadId}" class="table-dark"></thead>
+        <tbody id="${this.tableBodyId}"></tbody>
+      </table>
+      </tfoot>
+      `;
     }
 }
 

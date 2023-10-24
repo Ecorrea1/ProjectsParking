@@ -1,11 +1,14 @@
 class Footer extends HTMLElement {
     constructor() {
       super();
-      this.attributesComponents = [];
+      this.attributesComponents = [
+        this.message = 'Derechos Reservados',
+        this.year = '2023',
+      ];
     }
 
     static get observedAttributes(){
-      return [];
+      return ['message', 'year'];
     }
     attributeChangeCallback(attribute, _, newAttr){
       this.attributesComponents = [...this.attributesComponents, attribute]
@@ -16,7 +19,7 @@ class Footer extends HTMLElement {
         this.innerHTML = `
         <footer>
           <p class="copyright">
-            © Derechos Reservados 2023 | Simplepark</a>
+            © ${this.message} ${this.year} | Simplepark</a>
           </p>
         </footer>
       `;
