@@ -103,7 +103,7 @@ const sendInfoParking = async (idServicio = '', action = 'CREATE'|'EDIT') => {
   const result = await createEditRegister( data, 'POST', idServicio );
   if (!result) return showMessegeAlert( true, 'Error al editar el registro');
   await showRegisters();
-  bootstrap.Modal.getInstance(action = 'CREATE' ? modalRegister : modalInfo).hide();
+  bootstrap.Modal.getInstance(action == 'CREATE' ? modalRegister : modalInfo).hide();
   showMessegeAlert( false, 'EDIT' ? `Registro Editado` : 'Registro Creado');
 }
 
@@ -152,14 +152,12 @@ const showTitlesTable = () => {
 modalRegister.addEventListener('show.bs.modal', () => {
   clearForm();
   formRegister.reset();
-  console.log(moment().format());
   labelHourIngreso.value = moment().format('YYYY-MM-DD HH:mm:ss');
 });
 
 // Show all registers in the table
 const showRegisters = async () => {
   const registers = await consulta( api + 'registers', 'GET');
-  localStorage.setItem('estacionamientos',  JSON.stringify(registers.data));
   printList( registers.data );
 }
 // Show register by id
@@ -230,7 +228,7 @@ async function showModalCreateOrEdit( uid ) {
   formInfo.reset();
 
   const register = await consulta( api + 'registers/' + uid );
-  const dateNow = new moment().format('YYYY-MM-DD HH:mm:ss');
+  const dateNow = moment().format('YYYY-MM-DD HH:mm:ss');
   labelHourIngreso.value = dateNow;
 
   const { placaServicio, inicioServicio } = register.data;
@@ -268,7 +266,7 @@ function clearForm() {
 
 createRegister.addEventListener('click', () => clearForm());
 const addZeroToDate = (data) => data.toString().length == 1 ? '0' + data : data
-const changeDate = (date) => date ? date.substring(0, 10) + ' ' + date.substring(11,19) : '-'
+const changeDate = (date) => date ? moment(date).format('YYYY-MM-DD HH:mm:ss') : '-'
 
 window.addEventListener("load", async() => {
   inicioServicioSearchInput.max = new Date().toISOString().substring(0,10);
