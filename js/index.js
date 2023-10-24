@@ -235,9 +235,9 @@ async function showModalCreateOrEdit( uid ) {
   
   labelIdInfo.value = uid;
   patenteInputInfo.value = placaServicio;
-  labelHourIngresoInfo.value = moment(inicioServicio).format('YYYY-MM-DD HH:mm:ss');
+  labelHourIngresoInfo.value = changeDate(inicioServicio)
   labelHourEgresoInfo.value = dateNow;
-  totalInput.value = calculoMonto( inicioServicio, dateNow);
+  totalInput.value = calculoMonto( changeDate(inicioServicio), dateNow);
 }
 
 saveRegisterInfo.addEventListener('click', async(e) => {
@@ -266,7 +266,7 @@ function clearForm() {
 
 createRegister.addEventListener('click', () => clearForm());
 const addZeroToDate = (data) => data.toString().length == 1 ? '0' + data : data
-const changeDate = (date) => date ? moment(date).format('YYYY-MM-DD HH:mm:ss') : '-'
+const changeDate = (date) => date ? date.substring(0,19).replace('T', ' ') : '-'
 
 window.addEventListener("load", async() => {
   inicioServicioSearchInput.max = new Date().toISOString().substring(0,10);
